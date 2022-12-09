@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Цікаві факти про числа</string>
+    <string name="number">Введіть число</string>
+    <string name="get_fact">Отримати факт</string>
+    <string name="get_random_fact">Отримати факт про випадкове число</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
