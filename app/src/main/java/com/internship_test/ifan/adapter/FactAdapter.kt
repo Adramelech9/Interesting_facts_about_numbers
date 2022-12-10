@@ -11,12 +11,12 @@ import com.internship_test.ifan.R
 class FactAdapter(private val listener: Listener, private val listFact: ArrayList<String>) :
     RecyclerView.Adapter<FactAdapter.FactViewHolder>() {
     class FactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var fact: TextView = itemView.findViewById(R.id.fact)
+        val fact: TextView = itemView.findViewById(R.id.short_fact)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FactViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.activity_fact, parent, false)
+            .inflate(R.layout.fragment_short, parent, false)
         return FactViewHolder(itemView)
     }
 
@@ -25,13 +25,12 @@ class FactAdapter(private val listener: Listener, private val listFact: ArrayLis
         holder.fact.setOnClickListener {
             FactActivity.FACT = listFact[position]
             listener.start()
-
         }
     }
+
+    override fun getItemCount() = listFact.size
 
     interface Listener {
         fun start()
     }
-
-    override fun getItemCount() = 10
 }

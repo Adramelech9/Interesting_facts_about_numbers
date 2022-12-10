@@ -33,30 +33,28 @@ class MainActivity : AppCompatActivity(), FactAdapter.Listener {
             }
         })
         binding.getFact.setOnClickListener {
-            GlobalScope.launch {
-                getFact("$URL/${binding.inputNum.text}", db)
-            }
+            getFact("$URL/${binding.inputNum.text}", db)
         }
         binding.getRandomFact.setOnClickListener {
-            GlobalScope.launch {
-                getFact(RANDOM_URL, db)
-            }
+            getFact(RANDOM_URL, db)
         }
         val listFact = ArrayList<String>()
         db.getDao().getAllFact().asLiveData().observe(this) { list ->
             list.forEach {
-                listFact += it.fact
+                listFact.add(it.fact)
             }
+            binding.rv.layoutManager = LinearLayoutManager(this)
+            binding.rv.adapter = FactAdapter(this, listFact)
         }
-        binding.rv.layoutManager = LinearLayoutManager(this)
-        binding.rv.adapter = FactAdapter(this, listFact)
     }
 
     private fun getFact(url: String, db: Fact) {
-        FactActivity.FACT = URL(url).readText()
-        val fact = FactEntity(null, URL(url).readText())
-        db.getDao().insertFact(fact)
-        start()
+        GlobalScope.launch {
+            FactActivity.FACT = URL(url).readText()
+            val fact = FactEntity(null, FactActivity.FACT)
+            db.getDao().insertFact(fact)
+            start()
+        }
     }
 
     companion object {
