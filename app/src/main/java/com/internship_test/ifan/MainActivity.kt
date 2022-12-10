@@ -1,64 +1,70 @@
 package com.internship_test.ifan
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.asLiveData
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.internship_test.ifan.adapter.FactAdapter
+import com.internship_test.ifan.databinding.ActivityMainBinding
+import com.internship_test.ifan.model.Fact
+import com.internship_test.ifan.model.entity.FactEntity
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.URL
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FactAdapter.Listener {
 
-    private lateinit var inputNum: EditText
-    private lateinit var fact: Button
-    private lateinit var randomFact: Button
-    private lateinit var recyclerView: FrameLayout
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        val db = Fact.getData(this)
 
-        inputNum = findViewById(R.id.input_num)
-        fact = findViewById(R.id.get_fact)
-        randomFact = findViewById(R.id.get_random_fact)
-        recyclerView = findViewById(R.id.rv)
-
-        inputNum.addTextChangedListener(object : TextWatcher {
+        binding.inputNum.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {
-                fact.isEnabled = inputNum.text.isNotEmpty()
+                binding.getFact.isEnabled = binding.inputNum.text.isNotEmpty()
             }
         })
-        fact.setOnClickListener {
+        binding.getFact.setOnClickListener {
             GlobalScope.launch {
-                getFact("$URL/${inputNum.text}")
+                getFact("$URL/${binding.inputNum.text}", db)
             }
         }
-        randomFact.setOnClickListener {
+        binding.getRandomFact.setOnClickListener {
             GlobalScope.launch {
-                getFact(RANDOM_URL)
+                getFact(RANDOM_URL, db)
             }
         }
-        /*supportFragmentManager.beginTransaction().apply {
-            replace(R.id.rv, HistoryFragment(URL(RANDOM_URL).readText()))
-            addToBackStack(null)
-            commit()
-        }*/
+        val listFact = ArrayList<String>()
+        db.getDao().getAllFact().asLiveData().observe(this) { list ->
+            list.forEach {
+                listFact += it.fact
+            }
+        }
+        binding.rv.layoutManager = LinearLayoutManager(this)
+        binding.rv.adapter = FactAdapter(this, listFact)
     }
 
-    private fun getFact(url: String) {
+    private fun getFact(url: String, db: Fact) {
         FactActivity.FACT = URL(url).readText()
-        startActivity(Intent(this@MainActivity, FactActivity::class.java))
+        val fact = FactEntity(null, URL(url).readText())
+        db.getDao().insertFact(fact)
+        start()
     }
 
     companion object {
         private const val URL = "http://numbersapi.com"
         private const val RANDOM_URL = "$URL/random/math"
+    }
+
+    override fun start() {
+        startActivity(Intent(this@MainActivity, FactActivity::class.java))
     }
 }
