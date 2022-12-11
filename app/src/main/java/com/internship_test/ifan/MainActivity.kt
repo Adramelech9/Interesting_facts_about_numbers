@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity(), FactAdapter.Listener {
         }
         val listFact = ArrayList<String>()
         db.getDao().getAllFact().asLiveData().observe(this) { list ->
+            listFact.clear()
             list.forEach {
                 listFact.add(it.fact)
             }
