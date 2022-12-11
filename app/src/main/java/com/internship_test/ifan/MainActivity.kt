@@ -29,13 +29,13 @@ class MainActivity : AppCompatActivity(), FactAdapter.Listener {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun afterTextChanged(p0: Editable?) {
-                binding.getFact.isEnabled = binding.inputNum.text.isNotEmpty()
+                binding.buttonFact.isEnabled = binding.inputNum.text.isNotEmpty()
             }
         })
-        binding.getFact.setOnClickListener {
+        binding.buttonFact.setOnClickListener {
             getFact("$URL/${binding.inputNum.text}", db)
         }
-        binding.getRandomFact.setOnClickListener {
+        binding.buttonRandomFact.setOnClickListener {
             getFact(RANDOM_URL, db)
         }
         val listFact = ArrayList<String>()
